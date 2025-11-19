@@ -3,14 +3,20 @@ import datetime
 import geocoder
 import requests
 from django.http import HttpResponse  # pt functia sa fie view
+from django.shortcuts import render
 from django.template import loader
 from geocoder import location
-
 from YoutubeToText.models import Worldcities
 
 
 # Create your views here.
+def view_login(request):
+    # Aceasta randeaza fisierul 'login.html' pe care l-am creat anterior
+    return render(request, 'login.html')
 
+def view_signup(request):
+    # Randeaza pagina de inregistrare
+    return render(request, 'signup.html')
 def temp_somewhere(request):
     random_item = Worldcities.objects.all().order_by('?').first()
     city = random_item.city
