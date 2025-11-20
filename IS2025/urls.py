@@ -25,11 +25,7 @@ urlpatterns = [
      #Pagina principala (Login) - Ramane goala
     path('', views.view_login, name='login'),
     path('signup/', views.view_signup, name='signup'),
-    path('app/', views.temp_here, name='home_app'),
 
-    # Functia "Check other places" (daca ai pastrat-o in views.py aici)
-    # Este mai sigur sa o declari explicit aici daca o folosesti:
-    path('random/', views.temp_somewhere, name='temp_somewhere'),
 
-    path('yt/', include("YoutubeToText.urls")),
+    path('YoutubeToText/', include("YoutubeToText.urls")),
 ]

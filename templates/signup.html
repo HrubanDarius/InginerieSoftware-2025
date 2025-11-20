@@ -1,40 +1,39 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sign Up - YtToText</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
 </head>
-<body class="d-flex align-items-center justify-content-center vh-100 bg-light">
+<body>
+    <h1>Create Account</h1>
 
-    <div class="card p-4 shadow" style="width: 350px;">
-        <h3 class="text-center mb-4">Create Account</h3>
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: {% if 'success' in message.tags %}green{% else %}red{% endif %};">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
 
-        <form action="/" method="GET">
-            <div class="mb-3">
-                <label class="form-label">Username</label>
-                <input type="text" class="form-control" placeholder="Choose a username">
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Password</label>
-                <input type="password" class="form-control" placeholder="Create password">
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" placeholder="Repeat password">
-            </div>
-
-            <button type="submit" class="btn btn-success w-100">Sign Up</button>
-        </form>
-
-        <div class="text-center mt-3">
-            <small>Already have an account?
-                <a href="/" class="text-primary text-decoration-none fw-bold">Login</a>
-            </small>
+    <form action="/signup/" method="POST">
+        {% csrf_token %}
+        <div>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
         </div>
-    </div>
+        <div>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+        </div>
+        <button type="submit">Sign Up</button>
+    </form>
 
+    <p>
+        Already have an account? <a href="{% url 'login' %}">Sign In</a>
+    </p>
 </body>
 </html>
