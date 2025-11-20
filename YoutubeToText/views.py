@@ -2,8 +2,11 @@ import datetime
 
 import geocoder
 import requests
+from django.contrib import messages
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.models import User
 from django.http import HttpResponse  # pt functia sa fie view
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template import loader
 from geocoder import location
 from YoutubeToText.models import Worldcities
@@ -11,11 +14,37 @@ from YoutubeToText.models import Worldcities
 
 # Create your views here.
 def view_login(request):
-    # Aceasta randeaza fisierul 'login.html' pe care l-am creat anterior
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('/YoutubeToText/')  # Schimbat din '/app/'
+        else:
+            messages.error(request, 'Invalid username or password')
+
     return render(request, 'login.html')
 
 def view_signup(request):
-    # Randeaza pagina de inregistrare
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if password != confirm_password:
+            messages.error(request, 'Passwords do not match')
+            return render(request, 'signup.html')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already exists')
+            return render(request, 'signup.html')
+
+        User.objects.create_user(username=username, password=password)
+        messages.success(request, 'Account created successfully')
+        return redirect('/')
+
     return render(request, 'signup.html')
 def temp_somewhere(request):
     random_item = Worldcities.objects.all().order_by('?').first()
