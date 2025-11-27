@@ -17,7 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from YoutubeToText import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("",include("YoutubeToText.urls")),
+
+     #Pagina principala (Login) - Ramane goala
+    path('', views.view_login, name='login'),
+    path('signup/', views.view_signup, name='signup'),
+
+    path('YoutubeToText/', include("YoutubeToText.urls")),  #tot ce e in urls.youtubetotext e inclus
 ]
