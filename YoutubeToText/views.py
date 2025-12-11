@@ -1,4 +1,5 @@
 import datetime
+import os
 
 import geocoder
 import requests
@@ -9,7 +10,9 @@ from django.http import HttpResponse  # pt functia sa fie view
 from django.shortcuts import render, redirect
 from django.template import loader
 from geocoder import location
-from YoutubeToText.models import Worldcities
+
+from IS2025 import settings
+from YoutubeToText.models import Worldcities, ConvertedVideo
 
 
 # Create your views here.
@@ -46,6 +49,51 @@ def view_signup(request):
         return redirect('/')
 
     return render(request, 'signup.html')
+def save_from_file(request):
+    """Funcție dedicată pentru salvarea textului din de_citit.txt"""
+    if request.method == 'POST':
+        file_path = os.path.join(settings.BASE_DIR, 'de_citit.txt')
+
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read().strip()
+
+            if not content:
+                messages.error(request, 'de_citit.txt is empty! Add YouTube text first.')
+            else:
+                title = request.POST.get('title',
+                    'YouTube_Conversion_' + datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
+
+                ConvertedVideo.objects.create(
+                    title=title,
+                    content=content,
+                    user=request.user if request.user.is_authenticated else None
+                )
+
+                messages.success(request, f'Text saved successfully as "{title}"!')
+
+                # Golește fișierul după salvare
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    f.write('')
+
+        except FileNotFoundError:
+            messages.error(request, 'de_citit.txt not found!')
+        except Exception as e:
+            messages.error(request, f'Error: {str(e)}')
+
+    return redirect('temp_here')
+
+
+def view_dashboard(request):
+    # Afișează conversiile salvate
+    if request.user.is_authenticated:
+        converted_videos = ConvertedVideo.objects.filter(user=request.user)
+    else:
+        converted_videos = ConvertedVideo.objects.all()
+
+    return render(request, 'dashboard.html', {
+        'converted_videos': converted_videos
+    })
 def temp_somewhere(request):
     random_item = Worldcities.objects.all().order_by('?').first()
     city = random_item.city

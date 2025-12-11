@@ -5,17 +5,155 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>YtToText</title>
     <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
-{#    am add un css   dar poti face cu bootstrap partea de estetica#}
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .save-form {
+            background: #f5f7fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border: 2px dashed #667eea;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .save-form h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+
+        .save-form input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .save-form button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .save-form button:hover {
+            background: #5568d3;
+        }
+
+        .save-form small {
+            color: #666;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .dashboard-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .nav-links {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .messages {
+            margin-bottom: 20px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .messages p {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+
+        .messages .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .messages .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
 </head>
 
 <body>
+    <div>
+        <h1>{{ city }} este:</h1>
+        <h2>{{ temp }}°C</h2>
 
-    <h1>{{ city }} este: </h1>
-<h2>{{ temp }}</h2>
-<p>
-    <a href="{% url 'temp_somewhere' %}">Check other places</a>
-    <a href=".">Home</a>
-</p>
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <p class="{% if 'error' in message.tags %}error{% else %}success{% endif %}">
+                    {{ message }}
+                </p>
+            {% endfor %}
+        </div>
+        {% endif %}
 
+        <!-- Form pentru salvare text din de_citit.txt -->
+       <div class="save-form">
+        <h3>💾 Save Converted Text</h3>
+        <form method="POST" action="{% url 'save_from_file' %}">
+        {% csrf_token %}
+            <input type="text" name="title" placeholder="Enter title (optional)">
+             <button type="submit">Save</button>
+        </form>
+             <small>The text from de_citit.txt will be saved to the database.</small>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="dashboard-button">
+             View Converted Texts
+        </a>
+
+        <div class="nav-links">
+            <a href="{% url 'temp_somewhere' %}">Check other places</a>
+            <a href=".">Home</a>
+        </div>
+    </div>
 </body>
 </html>

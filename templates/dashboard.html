@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard - YtToText</title>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+    <style>
+        body {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        .test-form {
+            background: #f5f7fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 2px dashed #667eea;
+        }
+
+        .test-form h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+
+        .test-form input[type="text"] {
+            width: 70%;
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .test-form button {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .test-form button:hover {
+            background: #5568d3;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            margin: 40px 0;
+        }
+
+        .empty-state h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #666;
+        }
+
+        .conversions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .conversions-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .conversions-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .conversions-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .conversions-table tbody tr:hover {
+            background-color: #f8f9fa;
+            transition: background-color 0.2s ease;
+        }
+
+        .conversions-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .file-title {
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-title::before {
+            content: "📄";
+        }
+
+        .date-cell {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .action-button {
+            padding: 6px 12px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: background 0.2s ease;
+        }
+
+        .action-button:hover {
+            background: #5568d3;
+        }
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .messages p {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+
+        .messages .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .messages .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 Recently Converted Texts</h1>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <p class="{% if 'error' in message.tags %}error{% else %}success{% endif %}">
+                {{ message }}
+            </p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% if converted_videos %}
+        <table class="conversions-table">
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Date Saved</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for video in converted_videos %}
+                <tr>
+                    <td>
+                        <div class="file-title">
+                            {{ video.title }}
+                        </div>
+                    </td>
+                    <td class="date-cell">
+                        {{ video.created_at|date:"d M Y, H:i" }}
+                    </td>
+                    <td>
+                        <a href="#" class="action-button">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <h2>No converted texts yet</h2>
+            <p>Start converting YouTube videos to see them here!</p>
+        </div>
+    {% endif %}
+
+    <p>
+        <a href="{% url 'temp_here' %}" class="back-button">← Back to Home</a>
+    </p>
+</body>
+</html>
