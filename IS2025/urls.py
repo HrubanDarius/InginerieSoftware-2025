@@ -21,10 +21,7 @@ from YoutubeToText import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
-     #Pagina principala (Login) - Ramane goala
     path('', views.view_login, name='login'),
     path('signup/', views.view_signup, name='signup'),
-
-    path('YoutubeToText/', include("YoutubeToText.urls")),  #tot ce e in urls.youtubetotext e inclus
+    path('app/', include('YoutubeToText.urls')),
 ]

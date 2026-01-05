@@ -16,6 +16,9 @@ from YoutubeToText.models import Worldcities, ConvertedVideo
 
 
 # Create your views here.
+def index(request):
+    converted_text = request.session.get('converted_text', '')
+    return render(request, 'index.html', {'converted_text': converted_text})
 def view_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -24,7 +27,7 @@ def view_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('/YoutubeToText/')  # Schimbat din '/app/'
+            return redirect('YoutubeToText:index')  # MODIFICĂ AICI
         else:
             messages.error(request, 'Invalid username or password')
 
@@ -81,7 +84,7 @@ def save_from_file(request):
         except Exception as e:
             messages.error(request, f'Error: {str(e)}')
 
-    return redirect('temp_here')
+    return redirect('YoutubeToText:index')
 
 
 def view_dashboard(request):
@@ -94,42 +97,53 @@ def view_dashboard(request):
     return render(request, 'dashboard.html', {
         'converted_videos': converted_videos
     })
-def temp_somewhere(request):
-    random_item = Worldcities.objects.all().order_by('?').first()
-    city = random_item.city
-    location = [random_item.lat, random_item.lng]
-    temp = get_temp(location)
+def view_video_detail(request, video_id):
+    try:
+        video = ConvertedVideo.objects.get(id=video_id)
+        return render(request, 'video_detail.html', {'video': video})
+    except ConvertedVideo.DoesNotExist:
+        messages.error(request, 'Video not found!')
+        return redirect('YoutubeToText:dashboard')
+def convert_youtube(request):
+    if request.method == 'POST':
+        youtube_url = request.POST.get('youtube_url')
 
-    template = loader.get_template('index.html')
-    context = {
-        'city' : city,
-        'temp' : temp
-    }
+        try:
+            import yt_dlp
+            import whisper
+            import os
 
+            # 1. Download audio
+            ydl_opts = {
+                'format': 'bestaudio/best',
+                'outtmpl': 'downloads/audio.%(ext)s',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                }],
+            }
 
-    return HttpResponse(template.render(context, request))
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([youtube_url])
 
-def temp_here(request):  #ca sa fie un view trebe sa aiba un http request ca parametru si sa returneze un http obiect
-    location = geocoder.ip('me').latlng
+            # 2. Transcrie cu Whisper
+            model = whisper.load_model("base")
+            result = model.transcribe("downloads/audio.mp3")
 
-    temp = get_temp(location)
+            # 3. Salvează în de_citit.txt
+            file_path = os.path.join(settings.BASE_DIR, 'de_citit.txt')
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(result['text'])
 
-    # template sa arate mai bn
-    template = loader.get_template('index.html')
-    context = {
-        'city' : 'Your location',
-        'temp' : temp
-    }
+            # 4. Salvează textul în sesiune pentru afișare
+            request.session['converted_text'] = result['text']
 
+            # 5. Șterge fișierul audio temporar
+            os.remove('downloads/audio.mp3')
 
-    return HttpResponse(template.render(context, request))
+            messages.success(request, '✅ Video converted successfully!')
 
+        except Exception as e:
+            messages.error(request, f'❌ Conversion failed: {str(e)}')
 
-def get_temp(location):
-    endpoint = "https://api.open-meteo.com/v1/forecast"
-    api_request = f"{endpoint}?latitude={location[0]}&longitude={location[1]}&hourly=temperature_2m"
-    now = datetime.datetime.now()
-    hour = now.hour
-    meteo_data = requests.get(api_request).json()
-    temp = meteo_data['hourly']['temperature_2m'][hour]
-    return temp
+    return redirect('YoutubeToText:index')

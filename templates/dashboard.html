@@ -18,40 +18,6 @@
             margin-bottom: 30px;
         }
 
-        .test-form {
-            background: #f5f7fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border: 2px dashed #667eea;
-        }
-
-        .test-form h3 {
-            margin-top: 0;
-            color: #667eea;
-        }
-
-        .test-form input[type="text"] {
-            width: 70%;
-            padding: 8px;
-            margin-right: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .test-form button {
-            padding: 8px 16px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .test-form button:hover {
-            background: #5568d3;
-        }
-
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -174,9 +140,54 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #667eea;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-content h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
+    <div id="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Loading video details...</h3>
+        </div>
+    </div>
+
     <h1>📊 Recently Converted Texts</h1>
 
     {% if messages %}
@@ -188,6 +199,7 @@
         {% endfor %}
     </div>
     {% endif %}
+
     {% if converted_videos %}
         <table class="conversions-table">
             <thead>
@@ -209,7 +221,7 @@
                         {{ video.created_at|date:"d M Y, H:i" }}
                     </td>
                     <td>
-                        <a href="#" class="action-button">View</a>
+                        <a href="{% url 'YoutubeToText:view_video_detail' video.id %}" class="action-button video-link">View</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -223,7 +235,15 @@
     {% endif %}
 
     <p>
-        <a href="{% url 'temp_here' %}" class="back-button">← Back to Home</a>
+        <a href="{% url 'YoutubeToText:index' %}" class="back-button">← Back to Home</a>
     </p>
+
+    <script>
+        document.querySelectorAll('.video-link').forEach(link => {
+            link.addEventListener('click', function() {
+                document.getElementById('loading-overlay').style.display = 'flex';
+            });
+        });
+    </script>
 </body>
 </html>

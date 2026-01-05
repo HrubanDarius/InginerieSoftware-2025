@@ -1,10 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ video.title }} - YtToText</title>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+    <style>
+        body {
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .video-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .video-content {
+            background: #f5f7fa;
+            padding: 30px;
+            border-radius: 8px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        .back-button:hover {
+            background: #5568d3;
+        }
+    </style>
 </head>
 <body>
-$END$
+    <div class="video-header">
+        <h1>{{ video.title }}</h1>
+        <p>Saved on: {{ video.created_at|date:"d M Y, H:i" }}</p>
+    </div>
+
+    <div class="video-content">
+        {{ video.content }}
+    </div>
+
+    <a href="{% url 'YoutubeToText:dashboard' %}" class="back-button">← Back to Dashboard</a>
 </body>
 </html>
