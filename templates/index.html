@@ -21,7 +21,7 @@
             border-radius: 8px;
             margin-top: 20px;
             border: 2px dashed #667eea;
-            max-width: 700px;
+            max-width: 100%;
             width: 100%;
         }
 
@@ -178,7 +178,7 @@
         {% endif %}
 
         <div class="convert-form">
-            <h3>🎥 Convert YouTube Video</h3>
+            <h3> Convert YouTube Video</h3>
             <form method="POST" action="{% url 'YoutubeToText:convert_youtube' %}" id="convert-form">
                 {% csrf_token %}
                 <input type="text" name="youtube_url" placeholder="Paste YouTube URL here" required>
@@ -188,12 +188,12 @@
 
         {% if converted_text %}
         <div class="converted-text">
-            <h4>📝 Converted Text:</h4>
+            <h4> Converted Text:</h4>
             {{ converted_text }}
         </div>
 
         <div class="save-form">
-            <h3>💾 Save Converted Text</h3>
+            <h3> Save Converted Text</h3>
             <form method="POST" action="{% url 'YoutubeToText:save_from_file' %}">
                 {% csrf_token %}
                 <input type="text" name="title" placeholder="Enter title (optional)">
